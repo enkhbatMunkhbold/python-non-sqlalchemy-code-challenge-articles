@@ -111,14 +111,13 @@ class Magazine:
             if article.magazine not in publishings:
                 publishings[article.magazine] = 1
             else:
-                publishings[article.magazine] += 1
-        max_publisher = max(publishings, key = lambda publish: publishings[publish])
-        if len(max_publisher):
-            return max_publisher
+                publishings[article.magazine] += 1        
+
+        if len(publishings):
+            return max(publishings, key=lambda k: publishings[k])
         else:
             return None
             
-
 
     def articles(self):
         return [article for article in Article.all if article.magazine == self]
