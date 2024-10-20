@@ -1,3 +1,46 @@
+class Article:
+    all = []
+
+    def __init__(self, author, magazine, title):
+        self.author = author
+        self.magazine = magazine
+        self.title = title
+        type(self).all.append(self)
+
+    @property
+    def title(self):
+        return self._title
+    
+    @title.setter
+    def title(self, title):
+        if isinstance(title, str) and not hasattr(self, "title") and 5 <= len(title) <= 50:
+            self._title = title
+        else:
+            raise Exception
+
+    @property
+    def author(self):
+        return self._author
+
+    @author.setter
+    def author(self, author):
+        if isinstance(author, Author):
+            self._author = author
+        else:
+            raise Exception
+        
+    @property
+    def magazine(self):
+        return self._magazine
+
+    @magazine.setter
+    def magazine(self, magazine):
+        if isinstance(magazine, Magazine):
+            self._magazine = magazine
+        else:
+            raise Exception
+
+
 class Author:
     def __init__(self, name):
         self.name = name
@@ -24,7 +67,11 @@ class Author:
         return article
 
     def topic_areas(self):
-        return list({article.magazine.category for article in Article.all if article.author == self})
+        areas = list({magazine.category for magazine in self.magazines()})
+        if len(areas):
+            return areas
+        else:
+            return None
 
 
 class Magazine:
@@ -33,7 +80,7 @@ class Magazine:
     def __init__(self, name, category):
         self.name = name
         self.category = category
-        type(self).all.append(self)
+        Magazine.all.append(self)
 
     @property
     def name(self):
@@ -57,6 +104,21 @@ class Magazine:
         else:
             raise Exception
 
+    @classmethod
+    def top_publisher(cls):
+        publishings = {}
+        for article in Article.all:
+            if article.magazine not in publishings:
+                publishings[article.magazine] = 1
+            else:
+                publishings[article.magazine] += 1
+        max_publisher = max(publishings, key = lambda publish: publishings[publish])
+        if len(max_publisher):
+            return max_publisher
+        else:
+            return None
+            
+
 
     def articles(self):
         return [article for article in Article.all if article.magazine == self]
@@ -65,31 +127,21 @@ class Magazine:
         return list({article.author for article in Article.all if article.magazine == self})
 
     def article_titles(self):
-        return [article.title for article in Article.all if article.magazine == self]
+        titles = [article.title for article in self.articles()]
+        if len(titles):
+            return titles
+        else:
+            return None
 
     def contributing_authors(self):
-        pass
-
-
-class Article:
-    all = []
-
-    def __init__(self, author, magazine, title):
-        self.author = author
-        self.magazine = magazine
-        self.title = title
-        type(self).all.append(self)
-
-    @property
-    def title(self):
-        return self._title
-    
-    @title.setter
-    def title(self, title):
-        if isinstance(title, str) and not hasattr(self, "title") and 5 <= len(title) <= 50:
-            self._title = title
+        authors = []
+        top_contributors = []
+        for article in self.articles():
+            if article.author not in authors:
+                authors.append(article.author)
+            else:
+                top_contributors.append(article.author)
+        if len(top_contributors):
+            return top_contributors
         else:
-            raise Exception
-
-
-    # breakpoint()
+            return None
